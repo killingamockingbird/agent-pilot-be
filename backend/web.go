@@ -14,8 +14,6 @@ import (
 	"github.com/agent-pilot/agent-pilot-be/middleware"
 	"github.com/agent-pilot/agent-pilot-be/pkg/jwt"
 	"github.com/agent-pilot/agent-pilot-be/server"
-
-	einotool "github.com/cloudwego/eino/components/tool"
 )
 
 // 不引入wire了，wire有时候还是太吃屎了，中小型还是自己维护比较快
@@ -28,26 +26,23 @@ func initWebServer() *App {
 	logger := ioc.InitLogger(conf.Logconf)
 	om := ioc.NewOpenAIModelClient(context.Background(),
 		conf.OpenAIModel, conf.OpenAIBaseURL, conf.OpenAIAPIKey)
-	
+
 	// 加载 skills
 	skillDir := "skills"
 	skillReg, _ := skill.LoadSkills(skillDir)
-	
+
 	// 构建 tools
-	tools := []einotool.BaseTool{
-		&tool.LoadSkillTool{Reg: skillReg},
-		&tool.ShellTool{},
-	}
-	
+	tools := tool.BuildTools(skillReg)
+
 	// 构建 system prompt
 	systemMsg := chat.BuildSystemPrompt(skillReg.List())
-	
+
 	// 创建 ADK agent
 	agent := chat.NewMainAgent(context.Background(), om.Model, systemMsg, tools)
-	
+
 	// 创建 chat controller
 	cc := chat.NewController(context.Background(), agent, skillReg, systemMsg)
-	
+
 	//pkg
 	redisJWTHandler := jwt.NewRedisJWTHandler(conf.JwtConf)
 	// middleware

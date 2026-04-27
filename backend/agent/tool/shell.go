@@ -3,10 +3,11 @@ package tool
 import (
 	"context"
 	"encoding/json"
-	"github.com/cloudwego/eino/components/tool"
-	"github.com/cloudwego/eino/schema"
 	"os/exec"
 	"runtime"
+
+	"github.com/cloudwego/eino/components/tool"
+	"github.com/cloudwego/eino/schema"
 )
 
 type ShellTool struct{}
@@ -35,7 +36,7 @@ func (t *ShellTool) InvokableRun(
 	}
 
 	if err := json.Unmarshal([]byte(args), &input); err != nil {
-		return "", err
+		return "invalid shell arguments: " + err.Error(), nil
 	}
 
 	var cmd *exec.Cmd
@@ -46,6 +47,9 @@ func (t *ShellTool) InvokableRun(
 	}
 
 	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(out) + "\n" + err.Error(), nil
+	}
 
-	return string(out), err
+	return string(out), nil
 }

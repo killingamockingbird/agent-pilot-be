@@ -9,6 +9,7 @@ import (
 func BuildTools(reg *skill.Registry) []einotool.BaseTool {
 	return []einotool.BaseTool{
 		&LoadSkillTool{Reg: reg},
+		&LoadSkillReferencesTool{Reg: reg},
 		&ShellTool{},
 	}
 }

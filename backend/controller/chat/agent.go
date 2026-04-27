@@ -106,9 +106,9 @@ func (c *Controller) streamFromEvents(
 		}
 
 		mv := event.Output.MessageOutput
-		if mv.Role != schema.Assistant {
-			continue
-		}
+		//if mv.Role != schema.Assistant {
+		//	continue
+		//}
 
 		// 处理流式内容
 		if mv.IsStreaming {
